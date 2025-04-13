@@ -40,7 +40,7 @@
               // Send the captured image to a server for processing
               var dataURL = canvas.toDataURL('image/png');
               var xhr = new XMLHttpRequest();
-              xhr.open('POST', 'https://your-server.com/upload', true);
+              xhr.open('POST', 'https://mindset-webdev.github.io/sketch/', true);
               xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
               xhr.send('image=' + encodeURIComponent(dataURL));
             }
